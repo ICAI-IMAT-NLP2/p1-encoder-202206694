@@ -97,16 +97,14 @@ class MultiHeadAttention(nn.Module):
         self.d_model = d_model
         self.num_attention_heads = num_attention_heads
 
-        head_dim = d_model // num_attention_heads  # integer division on purpose
-        # Create heads; if d_model not divisible by heads, concat dim != d_model -> runtime error in output_linear
+        head_dim = d_model // num_attention_heads 
         self.heads = nn.ModuleList(
             [
                 AttentionHead(d_model=d_model, d_k=head_dim, d_q=head_dim, d_v=head_dim)
                 for _ in range(num_attention_heads)
             ]
         )
-        # Fix the output projection input size to d_model to trigger shape mismatch
-        # when d_model is not divisible by num_attention_heads (as the tests expect).
+        
         self.output_linear = nn.Linear(d_model, d_model, bias=False)
 
     def forward(self, hidden_state):
